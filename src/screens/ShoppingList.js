@@ -29,6 +29,46 @@ class ShoppingList extends React.Component {
         };
     }
 
+    //event handler: press on item OR its checkbox
+    _handleProductPress(product) {
+        this.state.products.forEach(p => {
+            if (product.id === p.id) {
+                p.gotten = !p.gotten;
+            }
+            return p;
+        });
+
+        //update state
+        this.setState({
+            products: this.state.products
+        });
+    }
+
+    //event handler: press on Fab right to navigate to AddProduct screen
+    _handleAddProductPress() {
+        this.props.navigation.navigate('AddProduct', {
+            addProduct: product => {
+                this.setState({
+                  products: this.state.products.concat(product)
+                });
+              },
+            deleteProduct: product => {
+            this.setState({
+                products: this.state.products.filter(p => p.id !== product.id)
+            });
+            },
+            productsInList: this.state.products
+        });
+    }
+
+    //event handler: press on Fab left to remove all items in the shopping list
+    _handleClearPress() {
+        Alert.alert('Clear all items?', null, [
+            { text: 'Cancel' },
+            { text: 'Ok', onPress: () => this.setState({ products: [] }) }
+        ]);
+    }
+
     render() {
         return (
             <Container>
@@ -36,12 +76,15 @@ class ShoppingList extends React.Component {
                     <List>
                         { this.state.products.map(p => {
                             return (   
-                                <ListItem key={p.id}>
+                                <ListItem key={p.id} onPress={this._handleProductPress.bind(this, p)} >
                                     <Body>
                                         <Text>{p.name}</Text>
                                     </Body>
                                     <Right>
-                                        <CheckBox checked={p.gotten} />
+                                        <CheckBox 
+                                            checked={p.gotten} 
+                                            onPress={this._handleProductPress.bind(this, p)} 
+                                        />
                                     </Right>
                                 </ListItem>
                             );
